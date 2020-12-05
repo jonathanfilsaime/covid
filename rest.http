@@ -1,0 +1,22 @@
+GET https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/11-28-2020.csv
+
+###
+GET http://localhost:8080/load/today
+
+###
+GET http://localhost:8080/load/sevendays
+
+###
+GET http://localhost:8080/data/county/dallas/state/texas/date/12-03-2020
+
+###
+GET http://localhost:8080/data/state/texas/date/12-03-2020
+
+
+###
+GET http://localhost:8080/data/sevendays/county/dallas/state/texas
+
+###
+GET http://localhost:8080/data/sevendays/state/texas
+
+
