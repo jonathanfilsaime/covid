@@ -22,7 +22,7 @@ public class HelperService {
         this.service = service;
     }
 
-    public CovidEntity computeFinalEntity(Optional<CovidEntity> current, Optional<CovidEntity> previous) throws Exception {
+    public CovidEntity computeFinalEntity(Optional<CovidEntity> current, Optional<CovidEntity> previous) {
 
         CovidEntity finalEntity = new CovidEntity();
 
@@ -36,9 +36,20 @@ public class HelperService {
             finalEntity.setRecovered(current.get().getRecovered() - previous.get().getRecovered());
             finalEntity.setActive(current.get().getActive() - previous.get().getActive());
             finalEntity.setDate(current.get().getDate());
+        } else if (current.isPresent()) {
+            finalEntity.setId(current.get().getId());
+            finalEntity.setCounty(current.get().getCounty());
+            finalEntity.setState(current.get().getState());
+            finalEntity.setCountry(current.get().getCountry());
+            finalEntity.setNewCases(0);
+            finalEntity.setDeaths(0);
+            finalEntity.setRecovered(0);
+            finalEntity.setActive(0);
+            finalEntity.setDate(current.get().getDate());
+        } else if (previous.isPresent()) {
+            throw new RuntimeException("data not present");
         } else {
-            throw new Exception("optional is empty");
-            //TODO create a nice response body
+            throw new RuntimeException("data not present");
         }
 
         return finalEntity;
@@ -57,7 +68,6 @@ public class HelperService {
                 out.write(text);
                 out.close();
                 log.info("File created successfully");
-                load(date);
             } catch (IOException e) {
                 log.error("issue creating the file " + e.getLocalizedMessage());
             }
@@ -66,7 +76,7 @@ public class HelperService {
         }
     }
 
-    private void load(String date) throws IOException {
+    private void load(String date) {
 
         StringBuilder st = new StringBuilder();
         st.append("covidData");
@@ -79,7 +89,7 @@ public class HelperService {
             while ((line = br.readLine()) != null) {
                 String[] token = line.split(",");
 
-                if (repository.checkIfExist(token[3].toLowerCase(), token[1].toLowerCase(), token[2].toLowerCase(), date) == 0){
+                if (repository.checkIfExist(token[3].toLowerCase(), token[1].toLowerCase(), token[2].toLowerCase(), date) == 0) {
                     CovidEntity entity = new CovidEntity();
                     entity.setCounty(token[1].toLowerCase());
                     entity.setState(token[2].toLowerCase());
@@ -95,6 +105,8 @@ public class HelperService {
                     log.info("No need to load the data for this date.The data is already in the database, county {}, state {}, country {}, new cases {}", token[1], token[2], token[3], token[7] );
                 }
             }
+        } catch (IOException e) {
+            log.error("unable to read or open file");
         }
     }
 
@@ -103,10 +115,10 @@ public class HelperService {
         if (!test.exists()) {
             log.info("file does not exists");
             write(service.getData(date), date);
-            load(date);
+//                load(date);
         } else {
             log.info("file exists already");
-            load(date);
+//            load(date);
         }
     }
 
