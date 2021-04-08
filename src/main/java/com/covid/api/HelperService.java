@@ -1,6 +1,7 @@
 package com.covid.api;
 
 import com.covid.api.model.CovidEntity;
+import com.covid.api.model.CovidStateEntity;
 import com.covid.api.repo.CovidRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,29 @@ public class HelperService {
             throw new RuntimeException("data not present");
         } else {
             throw new RuntimeException("data not present");
+        }
+
+        return finalEntity;
+    }
+
+    public CovidStateEntity computeFinalEntity(String state, String pvrDate, String curDate) {
+
+        Optional<Double> newCasesPrev = repository.findSumNewCasesByStateAndDate(state, pvrDate);
+        Optional<Double> deathPrev = repository.findSumDeathsByStateAndDate(state, pvrDate);
+
+        Optional<Double> newCasesCur = repository.findSumNewCasesByStateAndDate(state, curDate);
+        Optional<Double> deathCur = repository.findSumDeathsByStateAndDate(state, curDate);
+
+        CovidStateEntity finalEntity = new CovidStateEntity();
+
+        finalEntity.setState(state);
+        finalEntity.setDate(curDate);
+        if(newCasesPrev.isPresent() && newCasesCur.isPresent() && deathPrev.isPresent() && deathCur.isPresent()) {
+            finalEntity.setNewCases(newCasesCur.get() - newCasesPrev.get());
+            finalEntity.setDeaths(deathCur.get() - deathPrev.get());
+        } else {
+            finalEntity.setNewCases(0);
+            finalEntity.setDeaths(0);
         }
 
         return finalEntity;
@@ -115,10 +139,10 @@ public class HelperService {
         if (!test.exists()) {
             log.info("file does not exists");
             write(service.getData(date), date);
-//                load(date);
+                load(date);
         } else {
             log.info("file exists already");
-//            load(date);
+            load(date);
         }
     }
 
