@@ -6,9 +6,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import com.covid.api.model.CovidEntity;
 import com.covid.api.model.CovidStateEntity;
 import com.covid.api.repo.CovidRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,28 +44,28 @@ public class Controller {
     }
 
     @GetMapping("/data/county/{county}/state/{state}/date/{date}")
-    public CovidEntity getDataCountyDate(@PathVariable("county") String county,
-                                                         @PathVariable("state") String state,
-                                                         @PathVariable("date") String date) {
+    public ResponseEntity<CovidEntity> getDataCountyDate(@PathVariable("county") String county,
+                                            @PathVariable("state") String state,
+                                            @PathVariable("date") String date) {
         LocalDate previousDate = helper.computePreviousDate(date);
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
         String prvDate = previousDate.format(dateFormat);
         Optional<CovidEntity> currentEntity = repository.findByCountyStateAndDate(county.toLowerCase(), state.toLowerCase(), date.toLowerCase());
         Optional<CovidEntity> previousEntity = repository.findByCountyStateAndDate(county.toLowerCase(), state.toLowerCase(), prvDate.toLowerCase());
-        return helper.computeFinalEntity(currentEntity, previousEntity);
+        return ResponseEntity.ok(helper.computeFinalEntity(currentEntity, previousEntity));
     }
 
     @GetMapping("/data/state/{state}/date/{date}")
-    public CovidStateEntity getDataStateDate(@PathVariable("state") String state,
+    public ResponseEntity<CovidStateEntity> getDataStateDate(@PathVariable("state") String state,
                                  @PathVariable("date") String date) {
         LocalDate previousDate = helper.computePreviousDate(date);
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
         String prvDate = previousDate.format(dateFormat);
-        return helper.computeFinalEntity(state, prvDate, date);
+        return ResponseEntity.ok(helper.computeFinalEntity(state, prvDate, date));
     }
 
     @GetMapping("/data/county/{county}/state/{state}/days/{days}")
-    public List<CovidEntity> getDataCounty(@PathVariable("county") String county,
+    public ResponseEntity<List<CovidEntity>> getDataCounty(@PathVariable("county") String county,
                                            @PathVariable("state") String state,
                                            @PathVariable("days") int days) {
         int count = 1;
@@ -79,11 +81,11 @@ public class Controller {
             list.add(helper.computeFinalEntity(currentEntity, previousEntity));
             count++;
         }
-        return list;
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/data/state/{state}/days/{days}")
-    public List<CovidStateEntity> getDataState(@PathVariable("state") String state,
+    public ResponseEntity<List<CovidStateEntity>> getDataState(@PathVariable("state") String state,
                                               @PathVariable("days") int days) {
         int count = 1;
         List<CovidStateEntity> list = new ArrayList<>();
@@ -96,6 +98,14 @@ public class Controller {
             list.add(helper.computeFinalEntity(state, previousDate, currentDate));
             count++;
         }
-        return list;
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/data/state/{state}")
+    public ResponseEntity<List<String>> getCountiesPerState(@PathVariable("state") String state) {
+        LocalDate now = LocalDate.now().minusDays(1);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        String date = now.format(dateFormat);
+        return ResponseEntity.ok(repository.findListOfCountiesPerState(state, date));
     }
 }

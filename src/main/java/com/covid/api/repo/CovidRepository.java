@@ -1,10 +1,8 @@
 package com.covid.api.repo;
 
+import java.util.List;
 import java.util.Optional;
-
 import com.covid.api.model.CovidEntity;
-
-import com.covid.api.model.CovidStateEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -18,6 +16,9 @@ public interface CovidRepository extends CrudRepository<CovidEntity, Long> {
 
     @Query("SELECT t.state as state, SUM(t.newCases) as newCases, SUM(t.deaths) as deaths, SUM(t.recovered) as recovered, SUM(t.active) as active FROM CovidEntity t where t.state = ?1 AND t.date = ?2")
     public Optional<CovidEntity> findByStateAndDate(String state, String date);
+
+    @Query("SELECT t.county as county FROM CovidEntity t where t.state = ?1 AND t.date = ?2")
+    public List<String> findListOfCountiesPerState(String state, String data);
 
     @Query("SELECT SUM(t.newCases) as newCases FROM CovidEntity t where t.state = ?1 AND t.date = ?2")
     public Optional<Double> findSumNewCasesByStateAndDate(String state, String date);
