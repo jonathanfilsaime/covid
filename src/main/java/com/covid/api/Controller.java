@@ -43,6 +43,19 @@ public class Controller {
         log.info("done");
     }
 
+    @GetMapping("/data/county/{county}/state/{state}/today")
+    public ResponseEntity<CovidEntity> getDataCountyToday(@PathVariable("county") String county,
+                                                         @PathVariable("state") String state) {
+        LocalDate currentDate = LocalDate.now().minusDays(1);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        String date = dateFormat.format(currentDate);
+        LocalDate previousDate = helper.computePreviousDate(date);
+        String prvDate = previousDate.format(dateFormat);
+        Optional<CovidEntity> currentEntity = repository.findByCountyStateAndDate(county.toLowerCase(), state.toLowerCase(), date.toLowerCase());
+        Optional<CovidEntity> previousEntity = repository.findByCountyStateAndDate(county.toLowerCase(), state.toLowerCase(), prvDate.toLowerCase());
+        return ResponseEntity.ok(helper.computeFinalEntity(currentEntity, previousEntity));
+    }
+
     @GetMapping("/data/county/{county}/state/{state}/date/{date}")
     public ResponseEntity<CovidEntity> getDataCountyDate(@PathVariable("county") String county,
                                             @PathVariable("state") String state,
@@ -53,6 +66,16 @@ public class Controller {
         Optional<CovidEntity> currentEntity = repository.findByCountyStateAndDate(county.toLowerCase(), state.toLowerCase(), date.toLowerCase());
         Optional<CovidEntity> previousEntity = repository.findByCountyStateAndDate(county.toLowerCase(), state.toLowerCase(), prvDate.toLowerCase());
         return ResponseEntity.ok(helper.computeFinalEntity(currentEntity, previousEntity));
+    }
+
+    @GetMapping("/data/state/{state}/today")
+    public ResponseEntity<CovidStateEntity> getDataStateToday(@PathVariable("state") String state) {
+        LocalDate currentDate = LocalDate.now().minusDays(1);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        String curDate = dateFormat.format(currentDate);
+        LocalDate previousDate = helper.computePreviousDate(curDate);
+        String prvDate = previousDate.format(dateFormat);
+        return ResponseEntity.ok(helper.computeFinalEntity(state, prvDate, curDate));
     }
 
     @GetMapping("/data/state/{state}/date/{date}")
