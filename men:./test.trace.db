@@ -1,0 +1,15 @@
+2021-04-09 19:01:49 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "COVID_ENTITY" not found; SQL statement:
+select count(*) as col_0_0_ from covid_entity covidentit0_ where covidentit0_.country=? and covidentit0_.county=? and covidentit0_.state=? and covidentit0_.date=? [42102-200]
+2021-04-09 19:06:13 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "COVID_ENTITY" not found; SQL statement:
+select count(*) as col_0_0_ from covid_entity covidentit0_ where covidentit0_.country=? and covidentit0_.county=? and covidentit0_.state=? and covidentit0_.date=? [42102-200]
+2021-04-09 19:07:39 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "COVID_ENTITY" not found; SQL statement:
+select count(*) as col_0_0_ from covid_entity covidentit0_ where covidentit0_.country=? and covidentit0_.county=? and covidentit0_.state=? and covidentit0_.date=? [42102-200]
+2021-04-09 19:10:35 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "COVID_ENTITY" not found; SQL statement:
+select count(*) as col_0_0_ from covid_entity covidentit0_ where covidentit0_.country=? and covidentit0_.county=? and covidentit0_.state=? and covidentit0_.date=? [42102-200]
+2021-04-09 19:16:45 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "COVID_ENTITY" not found; SQL statement:
+select count(*) as col_0_0_ from covid_entity covidentit0_ where covidentit0_.country=? and covidentit0_.county=? and covidentit0_.state=? and covidentit0_.date=? [42102-200]

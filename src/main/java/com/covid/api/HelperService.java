@@ -81,7 +81,7 @@ public class HelperService {
 
     public void write(Mono<String> file, String date) {
         StringBuilder st = new StringBuilder();
-        st.append("covidData");
+        st.append("./covidData/covidData");
         st.append(date);
 
         try {
@@ -103,7 +103,7 @@ public class HelperService {
     private void load(String date) {
 
         StringBuilder st = new StringBuilder();
-        st.append("covidData");
+        st.append("./covidData/covidData");
         st.append(date);
 
         File file = new File(st.toString());
@@ -135,7 +135,7 @@ public class HelperService {
     }
 
     public void writeAndLoad(String date) throws IOException {
-        File test = new File("covidData"+date);
+        File test = new File("./covidData/covidData"+date);
         if (!test.exists()) {
             log.info("file does not exists");
             write(service.getData(date), date);
