@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import com.covid.api.model.CountyData;
 import com.covid.api.model.CovidEntity;
 import com.covid.api.model.CovidStateEntity;
+import com.covid.api.model.WorldData;
 import com.covid.api.repo.CovidRepository;
+import org.javatuples.Triplet;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,6 +111,18 @@ public class Controller {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/data/counties/state/{state}/today")
+    public ResponseEntity<List<CountyData>> getDataCounties(@PathVariable("state") String state) {
+        LocalDate now = LocalDate.now().minusDays(1);
+        LocalDate prv = LocalDate.now().minusDays(2);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        String currentDate = now.format(dateFormat);
+        String previousDate = prv.format(dateFormat);
+        List<CovidEntity> currentCountyData = repository.findListOfCountyData(state, currentDate);
+        List<CovidEntity> previousCountyData = repository.findListOfCountyData(state, previousDate);
+        return helper.computeFinalEntity(currentCountyData, previousCountyData);
+    }
+
     @GetMapping("/data/state/{state}/days/{days}")
     public ResponseEntity<List<CovidStateEntity>> getDataState(@PathVariable("state") String state,
                                               @PathVariable("days") int days) {
@@ -130,5 +146,14 @@ public class Controller {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
         String date = now.format(dateFormat);
         return ResponseEntity.ok(repository.findListOfCountiesPerState(state, date));
+    }
+
+    @GetMapping("/data/world")
+    public ResponseEntity<List<WorldData>> getWorldData() {
+        LocalDate now = LocalDate.now().minusDays(1);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        String date = now.format(dateFormat);
+        List<WorldData> data = new ArrayList<>(repository.findWorldData(date));
+        return ResponseEntity.ok(data);
     }
 }

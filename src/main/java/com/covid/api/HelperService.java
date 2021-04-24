@@ -1,14 +1,19 @@
 package com.covid.api;
 
+import com.covid.api.model.CountyData;
 import com.covid.api.model.CovidEntity;
 import com.covid.api.model.CovidStateEntity;
 import com.covid.api.repo.CovidRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.javatuples.Triplet;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -77,6 +82,25 @@ public class HelperService {
         }
 
         return finalEntity;
+    }
+
+    public ResponseEntity<List<CountyData>> computeFinalEntity(List<CovidEntity> current, List<CovidEntity> previous){
+        List<CountyData> countyDataResponse = new ArrayList<>();
+        System.out.println(current);
+        System.out.println(previous);
+        for (CovidEntity covidEntity : current) {
+            for(int i = 0; i < previous.size(); i++ ) {
+                if(covidEntity.getCounty().equalsIgnoreCase(previous.get(i).getCounty())) {
+                    CountyData data = new CountyData();
+                    data.setCountyName(covidEntity.getCounty());
+                    data.setNewCases(String.valueOf(covidEntity.getNewCases() - previous.get(i).getNewCases()));
+                    data.setDeaths(String.valueOf(covidEntity.getDeaths() - previous.get(i).getDeaths()));
+                    countyDataResponse.add(data);
+                }
+            }
+        }
+
+        return ResponseEntity.ok(countyDataResponse);
     }
 
     public void write(Mono<String> file, String date) {
